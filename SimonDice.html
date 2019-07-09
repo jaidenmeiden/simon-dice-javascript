@@ -93,40 +93,79 @@
       <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
     </div>
     <script>
-      const celeste = document.getElementById('celeste')
-      const violeta = document.getElementById('violeta')
-      const naranja = document.getElementById('naranja')
-      const verde = document.getElementById('verde')
-      const btnEmpezar = document.getElementById('btnEmpezar')
+        const celeste = document.getElementById('celeste')
+        const violeta = document.getElementById('violeta')
+        const naranja = document.getElementById('naranja')
+        const verde = document.getElementById('verde')
+        const btnEmpezar = document.getElementById('btnEmpezar')
 
-      class Juego {
-        constructor() {
-          this.inicializar();
-          this.generarSecuencia();
+        class Juego {
+            constructor() {
+                this.inicializar();
+                this.generarSecuencia();
+                this.siguientenivel();
+            }
+
+            inicializar() {
+                btnEmpezar.classList.add('hide');
+                this.nivel = 1;
+                this.colores = {
+                    celeste: celeste,
+                    violeta: violeta,
+                    naranja: naranja,
+                    verde: verde
+                }
+            }
+
+            generarSecuencia() {
+                //Se llama a la función fill para que existan elementos ya definidos, ya
+                //que la función map (Llamada posteriormente) no trabaja con elementos
+                //que no hayan sido definidos.
+                this.secuencia = new Array(10).fill(0).map(n => Math.floor(Math.random() * 4));
+            }
+
+            //Aumenta el nivel del usuario cada vez que el haga correctamente una repetición
+            siguientenivel(){
+                this.iluminarsecuencia();
+            }
+
+            transformarNumeroAColor (numero) {
+                switch (numero) {
+                    case 0:
+                        return 'celeste';
+                    case 1:
+                        return 'violeta';
+                    case 2:
+                        return 'naranja';
+                    case 3:
+                        return 'verde';
+                }
+            }
+
+            //Ilumina la secuencia cada vez que llegue a un nuevo nivel
+            iluminarsecuencia(){
+                for(let i = 0; i < this.nivel;i++) {
+                    const color = this.transformarNumeroAColor(this.secuencia[i]);
+                    setTimeout(() => this.iluminarColor(color), 1000 * i);
+                }
+            }
+
+            //Ilumina un objeto según corresponda
+            iluminarColor (color) {
+                this.colores[color].classList.add('light');
+                setTimeout(() => this.apagarColor(color), 350);
+            }
+
+            //Ilumina un objeto según corresponda
+            apagarColor(color) {
+                this.colores[color].classList.remove('light');
+            }
+
         }
 
-        inicializar() {
-          btnEmpezar.classList.add('hide');
-          this.nivel = 1;
-          this.colores = {
-              celeste: celeste,
-              violeta: violeta,
-              naranja: naranja,
-              verde: verde
-          }
+        function empezarJuego() {
+            window.juego = new Juego();
         }
-
-        generarSecuencia() {
-            //Se llama a la función fill para que existan elementos ya definidos, ya
-            //que la función map (Llamada posteriormente) no trabaja con elementos
-            //que no hayan sido definidos.
-            this.secuencia = new Array(10).fill(0).map(n => Math.floor(Math.random() * 4));
-        }
-      }
-
-      function empezarJuego() {
-        window.juego = new Juego();
-      }
     </script>
   
 
