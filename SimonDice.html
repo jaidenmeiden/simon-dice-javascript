@@ -82,6 +82,10 @@
       .hide {
         display: none;
       }
+
+        * {
+            font-family: Arial;
+        }
     </style>
   </head>
   <body>
@@ -92,6 +96,7 @@
       <div id="verde" class="color verde right" data-color="verde"></div>
       <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script>
         const celeste = document.getElementById('celeste');
         const violeta = document.getElementById('violeta');
@@ -108,21 +113,23 @@
             }
 
             inicializar() {
+                this.inicializar = this.inicializar.bind(this);//Mantiene el 'this' en el objeto así se use dentro de otra invocación como 'then'
                 this.siguienteNivel = this.siguienteNivel.bind(this);//Mantiene el 'this' en el objeto así se use dentro de otra invocación como 'setTimeout'
+                this.elegirColor = this.elegirColor.bind(this);
                 /*
                     Para evitar que coloquemos individualmente "bind(self)" en las siguientes intrucciones:
 
-                    => this.colores.celeste.addEventListener('click', this.elegirColor.bind(self));
-                    => this.colores.violeta.addEventListener('click', this.elegirColor.bind(self));
-                    => this.colores.naranja.addEventListener('click', this.elegirColor.bind(self));
-                    => this.colores.verde.addEventListener('click', this.elegirColor.bind(self));
+                    => this.colores.celeste.addEventListener('click', this.elegirColor.bind(this));
+                    => this.colores.violeta.addEventListener('click', this.elegirColor.bind(this));
+                    => this.colores.naranja.addEventListener('click', this.elegirColor.bind(this));
+                    => this.colores.verde.addEventListener('click', this.elegirColor.bind(this));
 
                     para referenciar el this (Objeto juego) al hacer click sobre los botones, se
                     puede colocar globalmente la siguiente instrucción:
 
                     => this.elegirColor = this.elegirColor.bind(this);
                  */
-                btnEmpezar.classList.add('hide');
+                this.toggleBtnEmpezar();
                 this.nivel = 1;
                 this.colores = {
                     celeste: celeste,
@@ -194,11 +201,10 @@
 
             //Agregas el evento click al iniciar un nuevo nivel
             agregarEventosClick() {
-                var self = this;
-                this.colores.celeste.addEventListener('click', this.elegirColor.bind(self));//Se incluye evento click al objeto
-                this.colores.violeta.addEventListener('click', this.elegirColor.bind(self));//Se incluye evento click al objeto
-                this.colores.naranja.addEventListener('click', this.elegirColor.bind(self));//Se incluye evento click al objeto
-                this.colores.verde.addEventListener('click', this.elegirColor.bind(self));//Se incluye evento click al objeto
+                this.colores.celeste.addEventListener('click', this.elegirColor);//Se incluye evento click al objeto
+                this.colores.violeta.addEventListener('click', this.elegirColor);//Se incluye evento click al objeto
+                this.colores.naranja.addEventListener('click', this.elegirColor);//Se incluye evento click al objeto
+                this.colores.verde.addEventListener('click', this.elegirColor);//Se incluye evento click al objeto
             }
 
             //Elimina el evento click al iniciar un nuevo nivel
@@ -220,14 +226,54 @@
                         this.nivel++;//Si llego, sube de nivel
                         this.eliminarEventosClick();
                         if(this.nivel === (ULTIMO_NIVEL + 1)) {//valida si llego al último nivel
-                            //Gano
+                            this.ganoElJuego();
                         } else {
-                            //Al hacer lo siguiente no cambia el 'this', ya que el 'this' fue atado al objeto 'Juego' desde el inicializador
-                            setTimeout(this.siguienteNivel, 1500);//Avanza al siguiente nivel para volver a competir
+                            this.pasoAlNivel(this.nivel);
                         }
                     }
                 } else {
-                    //Perdio
+                    this.perdioElJuego();
+                }
+            }
+
+            pasoAlNivel(nivel) {
+                swal({
+                    title: "Good job!",
+                    text: "You won level " + (nivel - 1),
+                    icon: "success",
+                    button: "I could!",
+                }).then(() => {
+                    //Al hacer lo siguiente no cambia el 'this', ya que el 'this' fue atado al objeto 'Juego' desde el inicializador
+                    setTimeout(this.siguienteNivel, 1000);//Avanza al siguiente nivel para volver a competir
+                });
+            }
+
+            ganoElJuego() {
+                swal({
+                    title: "Congratulations!",
+                    text: "You won the game!",
+                    icon: "success",
+                    button: "I won all levels!",
+                }).then(this.inicializar());
+            }
+
+            perdioElJuego() {
+                swal({
+                    title: "wrong!",
+                    text: "You lost!",
+                    icon: "error",
+                    button: "I lost!",
+                }).then(() => {
+                    this.eliminarEventosClick();
+                    this.inicializar();
+                });
+            }
+
+            toggleBtnEmpezar() {
+                if(btnEmpezar.classList.contains('hide')) {
+                    btnEmpezar.classList.remove('hide');
+                } else {
+                    btnEmpezar.classList.add('hide');
                 }
             }
         }
