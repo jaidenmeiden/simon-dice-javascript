@@ -107,6 +107,19 @@
             }
 
             inicializar() {
+                /*
+                    Para evitar que coloquemos individualmente "bind(self)" en las siguientes intrucciones:
+
+                    => this.colores.celeste.addEventListener('click', this.elegirColor.bind(self));
+                    => this.colores.violeta.addEventListener('click', this.elegirColor.bind(self));
+                    => this.colores.naranja.addEventListener('click', this.elegirColor.bind(self));
+                    => this.colores.verde.addEventListener('click', this.elegirColor.bind(self));
+
+                    para referenciar el this (Objeto juego) al hacer click sobre los botones, se
+                    puede colocar globalmente la siguiente instrucción:
+
+                    => this.elegirColor = this.elegirColor.bind(this);
+                 */
                 btnEmpezar.classList.add('hide');
                 this.nivel = 1;
                 this.colores = {
@@ -127,6 +140,7 @@
             //Aumenta el nivel del usuario cada vez que el haga correctamente una repetición
             siguientenivel(){
                 this.iluminarsecuencia();
+                this.agregarEventosClick();
             }
 
             transformarNumeroAColor (numero) {
@@ -159,6 +173,18 @@
             //Ilumina un objeto según corresponda
             apagarColor(color) {
                 this.colores[color].classList.remove('light');
+            }
+
+            agregarEventosClick() {
+                var self = this;
+                this.colores.celeste.addEventListener('click', this.elegirColor.bind(self));
+                this.colores.violeta.addEventListener('click', this.elegirColor.bind(self));
+                this.colores.naranja.addEventListener('click', this.elegirColor.bind(self));
+                this.colores.verde.addEventListener('click', this.elegirColor.bind(self));
+            }
+
+            elegirColor(ev) {
+                console.log(this);
             }
 
         }
